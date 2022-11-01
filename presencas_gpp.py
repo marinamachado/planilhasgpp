@@ -186,7 +186,6 @@ def main():
         all_tabs  = []
         # Itera por todas as abas da planilha e salva o nome 
         for s in spreadsheet['sheets']:
-            # print(s['note'])
             all_tabs.append(s['properties']['title'])
 
         
@@ -197,9 +196,6 @@ def main():
                 creat_tab(t,sheet,PRINCIPAL_SPREADSHEET_ID)
             else:
                 all_tabs.remove(t)
-
-
-
 
         # checar se tem mais e add (vamos dizer que adicionou um nome dps...)
 
@@ -247,7 +243,6 @@ def main():
         write(df_dados_por_semestre,METRICS,sheet,PRINCIPAL_SPREADSHEET_ID)
         write(df_dados_por_dia,f'{METRICS}!A4',sheet,PRINCIPAL_SPREADSHEET_ID)
         
-        
         spreadsheet_member = sheet.get(spreadsheetId=MEMBER_SPREADSHEET_ID, includeGridData=True).execute()
         
         all_tabs_member  = []
@@ -258,12 +253,16 @@ def main():
             
 
         for name in df['Nome']:
-            metricas_membro = metrics_per_member(df_non_transpose,name)
+
+            
+
+            metricas_membro = metrics_per_member(df_non_transpose.replace(pd.NA,''),name)
             if name not in all_tabs_member:
                 creat_tab(name,sheet,MEMBER_SPREADSHEET_ID)
             write(metricas_membro,name,sheet,MEMBER_SPREADSHEET_ID)
-            df_member = df_non_transpose[[name]].reset_index()
+            df_member = df_non_transpose.replace(pd.NA,'')[[name]].reset_index()
             df_member = df_member.rename(columns = {'index':'Data',name:'Situação'})
+            print(df_member)
             write(df_member,f'{name}!A4',sheet,MEMBER_SPREADSHEET_ID)
             
         print('cabou')
